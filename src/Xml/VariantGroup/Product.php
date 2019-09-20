@@ -3,38 +3,44 @@
 
 namespace Dandomain\Xml\VariantGroup;
 
-
 use Dandomain\Xml\Element;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class Product extends Element
 {
-    /**
-     * @var null
-     */
-    protected $advancedVariantText;
+    protected $productNumber;
+    protected $advancedVariants;
 
-    /**
-     * @var int
-     */
-    protected $relatedProductNumber;
-
-    public function __construct($advancedVariantText = null, $relatedProductNumber = null)
+    public function __construct($productNumber = null, ArrayCollection $advancedVariants = null)
     {
-        $this->advancedVariantText = $advancedVariantText;
-        $this->relatedProductNumber = $relatedProductNumber;
+        $this->productNumber = $productNumber;
+        $this->setAdvancedVariants($advancedVariants);
     }
 
-    /**
-     * @return string
-     */
     public function getXml()
     {
         $xml = '<PRODUCT>';
-        if ($this->advancedVariantText) {
-            $xml .= '<ADV_VAR_TEXT>' . $this->advancedVariantText . '</ADV_VAR_TEXT>';
+        $xml .= '<PROD_NUM>' . $this->productNumber . '</PROD_NUM>';
+        if ($this->advancedVariants && count($this->advancedVariants)) {
+            $xml .= '<ADVANCED_VARIANTS>';
+            foreach ($this->advancedVariants as $advancedVariant) {
+                $xml .= $advancedVariant->getXml();
+            }
+            $xml .= '</ADVANCED_VARIANTS>';
         }
-        $xml .= '<REL_PROD_NUM>' . $this->relatedProductNumber . '</REL_PROD_NUM>';
         $xml .= '</PRODUCT>';
         return $xml;
+    }
+
+    public function setAdvancedVariants($advancedVariants)
+    {
+        if (empty($advancedVariants)) {
+            $this->advancedVariants = new ArrayCollection();
+        } elseif (is_array($advancedVariants)) {
+            $this->advancedVariants = new ArrayCollection($advancedVariants);
+        } else {
+            $this->advancedVariants = $advancedVariants;
+        }
+        return $this;
     }
 }
