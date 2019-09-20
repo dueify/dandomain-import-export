@@ -35,7 +35,7 @@ class Price extends Element
 
     public function getXml()
     {
-        $xml = '';
+        $xml = '<PRICE>';
         if ($this->currencyCode) {
             $xml .= '<CURRENCY_CODE>' . $this->currencyCode . '</CURRENCY_CODE>';
         }
@@ -54,6 +54,7 @@ class Price extends Element
         if ($this->specialOfferPrice) {
             $xml .= '<SPECIAL_OFFER_PRICE>' . $this->formatMoney($this->specialOfferPrice) . '</SPECIAL_OFFER_PRICE>';
         }
+        $xml .= '</PRICE>';
         return $xml;
     }
 }
