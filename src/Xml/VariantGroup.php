@@ -3,40 +3,33 @@
 
 namespace Dandomain\Xml;
 
-
-use Dandomain\Xml\Variant\Variant;
+use Dandomain\Xml\VariantGroup\Variant;
+use Dandomain\Xml\VariantGroup\Product;
 use Doctrine\Common\Collections\ArrayCollection;
 
 class VariantGroup extends Element
 {
-    /**
-     * @var
-     */
     protected $groupLanguageId;
-    /**
-     * @var
-     */
     protected $groupName;
-    /**
-     * @var
-     */
     protected $groupFreeTextVariant;
-    /**
-     * @var
-     */
     protected $groupSort;
-    /**
-     * @var
-     */
     protected $groupSelectedText;
-    /**
-     * @var
-     */
     protected $groupType;
-
     protected $variants;
+    protected $products;
 
-    public function __construct($groupLanguageId, $groupName, $groupFreeTextVariant, $groupSort, $groupSelectedText, $groupType, $variants = null)
+    /**
+     * VariantGroup constructor.
+     * @param int $groupLanguageId
+     * @param string $groupName
+     * @param bool $groupFreeTextVariant
+     * @param int $groupSort
+     * @param string $groupSelectedText
+     * @param int $groupType
+     * @param ArrayCollection|null $variants
+     * @param ArrayCollection|null $products
+     */
+    public function __construct(int $groupLanguageId, string $groupName, bool $groupFreeTextVariant = false, int $groupSort = 0, string $groupSelectedText, int $groupType = 1, ArrayCollection $variants = null, ArrayCollection $products = null)
     {
         $this->groupLanguageId = $groupLanguageId;
         $this->groupName = $groupName;
@@ -45,6 +38,7 @@ class VariantGroup extends Element
         $this->groupSelectedText = $groupSelectedText;
         $this->groupType = $groupType;
         $this->setVariants($variants);
+        $this->setProducts($products);
     }
 
     public function getXml()
@@ -52,16 +46,23 @@ class VariantGroup extends Element
         $xml = '<VARIANT_GROUP>';
         $xml .= '<GRP_LANGUAGE_ID>' . $this->groupLanguageId . '</GRP_LANGUAGE_ID>';
         $xml .= '<GROUP_NAME>' . $this->groupName . '</GROUP_NAME>';
-        $xml .= '<GRP_FREE_TEXT_VARIANT>' . $this->groupFreeTextVariant . '</GRP_FREE_TEXT_VARIANT>';
+        $xml .= '<GRP_FREE_TEXT_VARIANT>' . ($this->groupFreeTextVariant ? 'True' : 'False') . '</GRP_FREE_TEXT_VARIANT>';
         $xml .= '<GRP_SORT>' . $this->groupSort . '</GRP_SORT>';
         $xml .= '<GRP_SELECTED_TEXT>' . $this->groupSelectedText . '</GRP_SELECTED_TEXT>';
         $xml .= '<GRP_TYPE>' . $this->groupType . '</GRP_TYPE>';
-        if($this->variants && count($this->variants)) {
+        if ($this->variants && count($this->variants)) {
             $xml .= '<VARIANTS>';
             foreach ($this->variants as $variant) {
                 $xml .= $variant->getXml();
             }
             $xml .= '</VARIANTS>';
+        }
+        if ($this->products && count($this->products)) {
+            $xml .= '<PRODUCTS>';
+            foreach ($this->products as $product) {
+                $xml .= $product->getXml();
+            }
+            $xml .= '</PRODUCTS>';
         }
         $xml .= '</VARIANT_GROUP>';
         return $xml;
@@ -169,7 +170,8 @@ class VariantGroup extends Element
      * @param Variant $variant
      * @return VariantGroup
      */
-    public function addVariant(Variant $variant) {
+    public function addVariant(Variant $variant)
+    {
         $this->variants[] = $variant;
         return $this;
     }
@@ -188,12 +190,46 @@ class VariantGroup extends Element
      */
     public function setVariants($variants)
     {
-        if(empty($variants)) {
+        if (empty($variants)) {
             $this->variants = new ArrayCollection();
-        } elseif(is_array($variants)) {
+        } elseif (is_array($variants)) {
             $this->variants = new ArrayCollection($variants);
         } else {
             $this->variants = $variants;
+        }
+        return $this;
+    }
+
+    /**
+     * @param Product $product
+     * @return $this
+     */
+    public function addProduct(Product $product)
+    {
+        $this->products[] = $product;
+        return $this;
+    }
+
+    /**
+     * @return Product[]|ArrayCollection
+     */
+    public function getProducts()
+    {
+        return $this->products;
+    }
+
+    /**
+     * @param $products
+     * @return $this
+     */
+    public function setProducts($products)
+    {
+        if (empty($products)) {
+            $this->products = new ArrayCollection();
+        } elseif (is_array($products)) {
+            $this->products = new ArrayCollection($products);
+        } else {
+            $this->products = $products;
         }
         return $this;
     }

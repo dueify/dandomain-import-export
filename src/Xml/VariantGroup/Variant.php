@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Dandomain\Xml\Variant;
+namespace Dandomain\Xml\VariantGroup;
 
 
 use Dandomain\Xml\Element;
